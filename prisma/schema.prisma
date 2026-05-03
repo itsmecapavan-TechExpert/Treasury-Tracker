@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum InterestFrequency {
+  MONTHLY
+  QUARTERLY
+  HALF_YEARLY
+  YEARLY
+  AT_MATURITY
+}
+
+enum DebentureType {
+  CUM_INTEREST
+  EX_INTEREST
+}
+
+enum DebentureTransactionType {
+  INTEREST
+  REDEMPTION
+}
+
+model Debenture {
+  id                String                 @id @default(cuid())
+  name              String
+  faceValue         Float
+  purchaseValue     Float // dirty price
+  cleanPrice        Float?
+  interestRate      Float
+  quantity          Int
+  purchaseDate      DateTime
+  maturityDate      DateTime
+  interestFrequency InterestFrequency
+  lastInterestDate  DateTime?
+  type              DebentureType
+  transactions      DebentureTransaction[]
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+}
+
+model DebentureTransaction {
+  id          String                   @id @default(cuid())
+  debentureId String
+  debenture   Debenture                @relation(fields: [debentureId], references: [id], onDelete: Cascade)
+  type        DebentureTransactionType
+  amount      Float
+  date        DateTime
+  createdAt   DateTime                 @default(now())
+}
+
+enum MFType {
+  SIP
+  LUMP_SUM
+}
+
+enum MFTransactionType {
+  BUY
+  SELL
+}
+
+model MutualFund {
+  id           String                @id @default(cuid())
+  name         String
+  AMC          String
+  type         MFType
+  transactions MFTransaction[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+}
+
+model MFTransaction {
+  id         String            @id @default(cuid())
+  fundId     String
+  fund       MutualFund        @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  type       MFTransactionType
+  units      Float
+  NAV        Float
+  date       DateTime
+  createdAt  DateTime          @default(now())
+}
+
+enum CompoundingFrequency {
+  MONTHLY
+  QUARTERLY
+  HALF_YEARLY
+  YEARLY
+  NONE
+}
+
+model FixedDeposit {
+  id                   String               @id @default(cuid())
+  bankName             String
+  principal            Float
+  interestRate         Float
+  startDate            DateTime
+  maturityDate         DateTime
+  compoundingFrequency CompoundingFrequency
+  TDSRate              Float
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+}
