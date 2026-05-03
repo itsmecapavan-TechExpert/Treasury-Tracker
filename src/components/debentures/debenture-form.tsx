@@ -47,11 +47,7 @@ export function DebentureForm() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Debenture
-        </Button>
+      <DialogTrigger render={<Button size="sm"><PlusCircle className="mr-2 h-4 w-4" />Add Debenture</Button>}>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

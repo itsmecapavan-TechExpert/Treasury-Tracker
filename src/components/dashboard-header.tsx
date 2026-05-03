@@ -30,7 +30,7 @@ export function DashboardHeader() {
           <Bell className="h-5 w-5" />
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Button variant="ghost" size="icon" className="rounded-full border">
               <User className="h-5 w-5" />
             </Button>

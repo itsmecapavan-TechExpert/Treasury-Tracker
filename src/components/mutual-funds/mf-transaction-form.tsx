@@ -47,10 +47,7 @@ export function MFTransactionForm({ fundId, fundName }: { fundId: string, fundNa
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <ArrowLeftRight className="h-4 w-4" />
-        </Button>
+      <DialogTrigger render={<Button variant="ghost" size="icon"><ArrowLeftRight className="h-4 w-4" /></Button>}>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
