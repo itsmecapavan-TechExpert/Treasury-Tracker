@@ -14,9 +14,24 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
         });
+
+        // AUTO-SETUP: If no user exists at all, create the first one as admin
+        const userCount = await prisma.user.count();
+        if (!user && userCount === 0) {
+          const hashedPassword = await bcrypt.hash(credentials.password as string, 10);
+          user = await prisma.user.create({
+            data: {
+              email: credentials.email as string,
+              name: "Admin",
+              password: hashedPassword,
+              role: "ADMIN",
+            },
+          });
+          return user;
+        }
 
         if (!user || !user.password) return null;
 
