@@ -4,7 +4,7 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 
 const pool = new Pool({ 
-  connectionString: "postgresql://neondb_owner:npg_I3jDKh0qlJWY@ep-plain-salad-ao2sqcuz-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require" 
+  connectionString: process.env.DATABASE_URL 
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
