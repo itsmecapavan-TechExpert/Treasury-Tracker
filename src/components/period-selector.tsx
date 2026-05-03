@@ -54,12 +54,13 @@ export function PeriodSelector({ onPeriodChange }: PeriodSelectorProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger render={
         <Button variant="outline" size="sm" className="h-9 gap-2">
           <CalendarIcon className="h-4 w-4" />
           <span>{selectedLabel}</span>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
+      }>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[180px]">
         <DropdownMenuItem onClick={() => handleSelect("ALL", "All Time")}>
