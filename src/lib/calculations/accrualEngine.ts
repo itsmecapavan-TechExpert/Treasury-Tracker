@@ -40,10 +40,10 @@ export const processMonthlyAccruals = (
 
     return {
       investmentId: debenture.id,
-      type: 'DEBENTURE' as const,
+      type: 'DEBENTURE',
       amount,
       date: accrualDate
-    };
+    } as AccrualEntry;
   }).filter((entry): entry is AccrualEntry => entry !== null);
 
   const fdAccruals = fixedDeposits.map(fd => {
@@ -61,10 +61,10 @@ export const processMonthlyAccruals = (
 
     return {
       investmentId: fd.id,
-      type: 'FD' as const,
+      type: 'FD',
       amount,
       date: accrualDate
-    };
+    } as AccrualEntry;
   }).filter((entry): entry is AccrualEntry => entry !== null);
 
   return [...debentureAccruals, ...fdAccruals];
