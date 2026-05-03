@@ -19,11 +19,26 @@ import {
   DialogTrigger,
   DialogFooter
 } from "@/components/ui/dialog"
-import { PlusCircle, Loader2 } from "lucide-react"
-import { addDebenture } from "@/lib/actions/debentureActions"
+import { PlusCircle, Loader2, Edit2 } from "lucide-react"
+import { addDebenture, updateDebenture } from "@/lib/actions/debentureActions"
 import { toast } from "sonner"
 
-export function DebentureForm() {
+interface DebentureFormProps {
+  initialData?: {
+    id: string
+    name: string
+    faceValue: number
+    purchaseValue: number
+    interestRate: number
+    quantity: number
+    purchaseDate: string
+    maturityDate: string
+    interestFrequency: string
+    type: string
+  }
+}
+
+export function DebentureForm({ initialData }: DebentureFormProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -34,64 +49,74 @@ export function DebentureForm() {
     const formData = new FormData(event.currentTarget)
     const data = Object.fromEntries(formData.entries())
 
-    const result = await addDebenture(data)
+    const result = initialData
+      ? await updateDebenture(initialData.id, data)
+      : await addDebenture(data)
 
     setLoading(false)
     if (result.success) {
-      toast.success("Debenture added successfully")
+      toast.success(initialData ? "Debenture updated" : "Debenture added")
       setOpen(false)
     } else {
-      toast.error(result.error || "Failed to add debenture")
+      toast.error(result.error || "Operation failed")
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="sm"><PlusCircle className="mr-2 h-4 w-4" />Add Debenture</Button>}>
+      <DialogTrigger render={
+        initialData ? (
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+            <Edit2 className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button size="sm"><PlusCircle className="mr-2 h-4 w-4" />Add Debenture</Button>
+        )
+      }>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Debenture</DialogTitle>
+          <DialogTitle>{initialData ? "Edit Debenture" : "Add New Debenture"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" placeholder="e.g. NHAI 8.75% 2029" required />
+            <Input id="name" name="name" defaultValue={initialData?.name} placeholder="e.g. NHAI 8.75% 2029" required />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="faceValue">Face Value</Label>
-              <Input id="faceValue" name="faceValue" type="number" step="0.01" required />
+              <Input id="faceValue" name="faceValue" type="number" step="0.01" defaultValue={initialData?.faceValue} required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="purchaseValue">Purchase Price (Dirty)</Label>
-              <Input id="purchaseValue" name="purchaseValue" type="number" step="0.01" required />
+              <Input id="purchaseValue" name="purchaseValue" type="number" step="0.01" defaultValue={initialData?.purchaseValue} required />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="interestRate">Interest Rate (%)</Label>
-              <Input id="interestRate" name="interestRate" type="number" step="0.01" required />
+              <Input id="interestRate" name="interestRate" type="number" step="0.01" defaultValue={initialData?.interestRate} required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="quantity">Quantity</Label>
-              <Input id="quantity" name="quantity" type="number" required />
+              <Input id="quantity" name="quantity" type="number" defaultValue={initialData?.quantity} required />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="purchaseDate">Purchase Date</Label>
-              <Input id="purchaseDate" name="purchaseDate" type="date" required />
+              <Input id="purchaseDate" name="purchaseDate" type="date" defaultValue={initialData?.purchaseDate} required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="maturityDate">Maturity Date</Label>
-              <Input id="maturityDate" name="maturityDate" type="date" required />
+              <Input id="maturityDate" name="maturityDate" type="date" defaultValue={initialData?.maturityDate} required />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="interestFrequency">Frequency</Label>
-              <Select name="interestFrequency" defaultValue="YEARLY">
+              <Select name="interestFrequency" defaultValue={initialData?.interestFrequency || "YEARLY"}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
@@ -106,7 +131,7 @@ export function DebentureForm() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
-              <Select name="type" defaultValue="CUM_INTEREST">
+              <Select name="type" defaultValue={initialData?.type || "CUM_INTEREST"}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -120,7 +145,7 @@ export function DebentureForm() {
           <DialogFooter>
             <Button type="submit" disabled={loading} className="w-full">
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Debenture
+              {initialData ? "Update Debenture" : "Save Debenture"}
             </Button>
           </DialogFooter>
         </form>

@@ -43,3 +43,37 @@ export async function addMFTransaction(fundId: string, formData: any) {
     return { success: false, error: "Failed to add MF transaction" }
   }
 }
+
+export async function updateMutualFund(id: string, formData: any) {
+  try {
+    const mf = await prisma.mutualFund.update({
+      where: { id },
+      data: {
+        name: formData.name,
+        AMC: formData.AMC,
+        type: formData.type as MFType,
+      },
+    })
+
+    revalidatePath("/")
+    revalidatePath("/mutual-funds")
+    return { success: true, data: mf }
+  } catch (error) {
+    console.error("Failed to update mutual fund:", error)
+    return { success: false, error: "Failed to update mutual fund" }
+  }
+}
+
+export async function deleteMutualFund(id: string) {
+  try {
+    await prisma.mutualFund.delete({
+      where: { id },
+    })
+    revalidatePath("/")
+    revalidatePath("/mutual-funds")
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to delete mutual fund:", error)
+    return { success: false, error: "Failed to delete mutual fund" }
+  }
+}

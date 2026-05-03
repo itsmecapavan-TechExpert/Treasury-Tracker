@@ -11,6 +11,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MFForm } from "@/components/mutual-funds/mf-form"
 import { MFTransactionForm } from "@/components/mutual-funds/mf-transaction-form"
+import { DeleteAction } from "@/components/delete-action"
+import { deleteMutualFund } from "@/lib/actions/mfActions"
 import { calculateXIRR } from "@/lib/calculations/xirrCalculator"
 import { Badge } from "@/components/ui/badge"
 
@@ -47,7 +49,7 @@ export default async function MutualFundsPage() {
                 <TableHead>Units</TableHead>
                 <TableHead>Avg Cost</TableHead>
                 <TableHead>Current Value</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+                <TableHead className="w-[150px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -79,7 +81,6 @@ export default async function MutualFundsPage() {
                   const mockCurrentNAV = avgCost * 1.15;
                   const mockCurrentValue = totalUnits * mockCurrentNAV;
                   
-                  // Add final valuation to cash flows for XIRR
                   if (totalUnits > 0) {
                     cashFlows.push({ amount: mockCurrentValue, date: new Date() });
                   }
@@ -102,7 +103,11 @@ export default async function MutualFundsPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <MFTransactionForm fundId={f.id} fundName={f.name} />
+                        <div className="flex items-center gap-1">
+                          <MFTransactionForm fundId={f.id} fundName={f.name} />
+                          <MFForm initialData={{ id: f.id, name: f.name, AMC: f.AMC, type: f.type }} />
+                          <DeleteAction id={f.id} onDelete={deleteMutualFund} itemName={f.name} />
+                        </div>
                       </TableCell>
                     </TableRow>
                   )

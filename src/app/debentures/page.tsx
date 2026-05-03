@@ -13,6 +13,8 @@ import { DebentureForm } from "@/components/debentures/debenture-form"
 import { calculateAccruedInterest } from "@/lib/calculations/interestCalculator"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
+import { DeleteAction } from "@/components/delete-action"
+import { deleteDebenture } from "@/lib/actions/debentureActions"
 
 export default async function DebenturesPage() {
   const debentures = await prisma.debenture.findMany({
@@ -48,12 +50,13 @@ export default async function DebenturesPage() {
                 <TableHead>Accrued Interest</TableHead>
                 <TableHead>Maturity</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {debentures.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
+                  <TableCell colSpan={8} className="h-24 text-center">
                     No debentures found. Add one to get started.
                   </TableCell>
                 </TableRow>
@@ -76,6 +79,23 @@ export default async function DebenturesPage() {
                       <TableCell>{format(new Date(d.maturityDate), 'dd MMM yyyy')}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{d.type}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <DebentureForm initialData={{
+                            id: d.id,
+                            name: d.name,
+                            faceValue: d.faceValue,
+                            purchaseValue: d.purchaseValue,
+                            interestRate: d.interestRate,
+                            quantity: d.quantity,
+                            purchaseDate: format(new Date(d.purchaseDate), 'yyyy-MM-dd'),
+                            maturityDate: format(new Date(d.maturityDate), 'yyyy-MM-dd'),
+                            interestFrequency: d.interestFrequency,
+                            type: d.type
+                          }} />
+                          <DeleteAction id={d.id} onDelete={deleteDebenture} itemName={d.name} />
+                        </div>
                       </TableCell>
                     </TableRow>
                   )
